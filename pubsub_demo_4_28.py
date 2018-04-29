@@ -136,7 +136,7 @@ def drawColor(row, col, strip, ledColor, wait_ms=50):
     if col == 0:
         # Clear rest of the colors for this new row
         for i in range(1, colMax):
-            strip.setPixelColor(matrix[row + offset][i], Color(0, 0, 0))
+            strip.setPixelColor(matrix[row + offset][i], off.color)
 
 # def drawGreen(row, col, strip, color, wait_ms=50):
 #     rowToAdd = row + rRow + yRow
@@ -201,6 +201,16 @@ def decrementGreen():
         gCol -= 1
 
 def redrawColors(ledColor):
+    switcher = {
+        yellow: yCol,
+        red: rCol,
+        green: gCol
+    }
+    col = switcher.get(ledColor)
+
+    if (col != 1):
+        return
+
     if ledColor == green:
         return
     if hasGreen():
@@ -265,8 +275,8 @@ def add(ledColor, row, col, strip):
     if row > rowMax - 1:
         return
     drawColor(row, col, strip, ledColor)
-    redrawColors(ledColor)
     incrementColor(ledColor)
+    redrawColors(ledColor)
     strip.show()
 
 
