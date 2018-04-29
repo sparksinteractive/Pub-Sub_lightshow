@@ -138,24 +138,6 @@ def drawColor(row, col, strip, ledColor, wait_ms=50):
         for i in range(1, colMax):
             strip.setPixelColor(matrix[row + offset][i], off.color)
 
-# def drawGreen(row, col, strip, color, wait_ms=50):
-#     rowToAdd = row + rRow + yRow
-#     if rCol > 0:
-#         rowToAdd += 1
-#     if yCol > 0:
-#         rowToAdd += 1
-#     strip.setPixelColor(matrix[rowToAdd][col], color)
-
-# def drawRed(row, col, strip, color, wait_ms=50):
-#     rowToAdd = row + yRow
-#     if yCol > 0:
-#         rowToAdd += 1
-# #        if rCol == 0:
-#             # Clear rest of row
-# #            for i in range (1, colMax):
-# #                strip.setPixelColor(matrix[row][i], Color(0, 0, 0))
-#     strip.setPixelColor(matrix[rowToAdd][col], color)
-
 def incrementYellow():
     global yRow, yCol
     if yCol < (colMax - 1):
@@ -191,7 +173,6 @@ def incrementColor(ledColor):
     }
     return switcher.get(ledColor)()
 
-
 def decrementGreen():
     global gRow, gCol
     if gCol == 0:
@@ -224,51 +205,6 @@ def redrawColors(ledColor):
 
 #------ADDING COLORS-----------------------------------------------------------------------------------------------
 
-
-# def addYellow(strip, color, wait_ms=50):
-#     print 'add yellow at: ', matrix[yRow][yCol]
-    
-#     if yRow > rowMax - 1:
-#         return
-#     drawColor(yRow, yCol, strip, color)
-#     incrementYellow()
-#     if yCol == 1:
-#         if hasRed():
-#             redrawRed()
-#         if hasGreen():
-#             redrawGreen()
-#     strip.show()
-
-# def addRed(strip, color):
-#     global rRow, rCol
-#     print 'add red at: ', matrix[rRow][rCol]
-#     if rRow > rowMax-1:
-#         return
-
-# #        if rCol == 0:
-#             # Clear rest of row
-# #            for i in range (1, colMax):
-# #                strip.setPixelColor(matrix[rRow][i], Color(0, 0, 0))
-#     drawRed(rRow, rCol, strip, color)
-#     if rCol < colMax -1:
-#         rCol += 1
-#     else:
-#         rCol =0
-#         rRow += 1
-
-#         if rCol == 1:
-#             if hasGreen():
-#                 redrawGreen()
-#     strip.show()
-
-# def addGreen(strip, color, wait_ms=50):
-#     print "add green at: ", matrix[gRow][gCol]
-#     if gRow > rowMax - 1:
-#         return
-#     else:
-#         drawGreen(gRow, gCol, strip, color)
-#         incrementGreen()
-#     strip.show()
 
 def add(ledColor, row, col, strip):
     print "adding ", ledColor, " at ", matrix[row][col]
