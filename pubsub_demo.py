@@ -28,8 +28,8 @@ colMax = 32
 rowMax = 4
 
 # encoder config
-clk1 = 2
-dt1 = 3
+clk1 = 17
+dt1 = 27
 
 clk2 = 5
 dt2 = 6
