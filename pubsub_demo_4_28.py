@@ -12,17 +12,9 @@ matrix = [[0 for x in range(w)] for y in range(h)]
 val = 0
 
 for i in range(0,20):
-        for j in range(0,32):
-                matrix[i][j] =val
-                val += 1
-# yellow.row = 0
-# yellow.col = 0
-
-# red.row = 0
-# red.col = 0
-
-# green.row = 0
-# green.col = 0
+    for j in range(0,32):
+        matrix[i][j] =val
+        val += 1
 
 colMax = 32
 rowMax = 4
@@ -51,6 +43,7 @@ LED_COUNT    = 300      # Number of LED pixels.
 LED_PIN        = 12      # GPIO pin connected to the pixels (18 uses PWM!).
 RING_COUNT     = 48
 RING          = 19
+
 #LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
 LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA        = 10      # DMA channel to use for generating signal (try 10)
@@ -71,19 +64,13 @@ GPIO.setup(dt4, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(clk5, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(dt5, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-#count = encoder.counter
-count = 0
-yellowCount = 0
-redCount = 0
-greenCount = 0
-blueCount = 0
-magentaCount = 0
-
 clk1LastState = GPIO.input(clk1)
 clk2LastState = GPIO.input(clk2)
 clk3LastState = GPIO.input(clk3)
 clk4LastState = GPIO.input(clk4)
 clk5LastState = GPIO.input(clk5)
+
+# LED MATRIX ANIMATIONS.
 
 class LEDColor:
     def __init__(self, color, name):
@@ -124,8 +111,6 @@ green = LEDColor(Color(255,0,0), 'GREEN')
 blue = LEDColor(Color(0,0,255), 'BLUE')
 magenta = LEDColor(Color(0,255,255), 'MAGENTA')
 off = LEDColor(Color(0,0,0), 'OFF')
-
-# LED MATRIX ANIMATIONS.
 
 def redrawColor(ledColor, removeEnd, strip):
     if removeEnd:
@@ -237,7 +222,7 @@ def remove(ledColor, strip):
         redrawColors(ledColor, True, strip)
     strip.show()
 
-#RING ANIMATIONS
+# RING ANIMATIONS
 def ringWipe(strip, color, ringNumber, shade, wait_ms=50):
     print 'Ring: Adding', shade, 'at ', ring1
     ring.setPixelColor(ringNumber, color)
@@ -252,16 +237,16 @@ if __name__ == '__main__':
     # Create NeoPixel object with appropriate configuration.
     strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
     ring = Adafruit_NeoPixel(RING_COUNT, RING, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, RING_CHANNEL)
+
     # Intialize the library (must be called once before other functions).
     strip.begin()
     ring.begin()
-    print count
     print ('Press Ctrl-C to quit.')
+
     if not args.clear:
         print('Use "-c" argument to clear LEDs on exit')
         try:
             while True:
-#                print ('Color wipe animations.')
                 clk1State = GPIO.input(clk1)
                 dt1State = GPIO.input(dt1)
                 clk2State = GPIO.input(clk2)
@@ -313,7 +298,6 @@ if __name__ == '__main__':
                 clk3LastState = clk3State
                 clk4LastState = clk4State
                 clk5LastState = clk5State
-#                sleep(0.01)
         except KeyboardInterrupt:
             if args.clear:
                 colorWipe(strip, Color(0,0,0), 10)
