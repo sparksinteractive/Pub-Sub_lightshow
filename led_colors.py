@@ -46,12 +46,15 @@ class LEDColor:
         self.col -= 1
         return self.col == 0 and self.row == 0
 
+    def getPosition(self):
+        return matrix[self.row][self.col]
+
 yellow = LEDColor(Color(255,255,0), 'YELLOW', 0)
 red = LEDColor(Color(0,255,0), 'RED', 1)
 green = LEDColor(Color(255,0,0), 'GREEN', 2)
 blue = LEDColor(Color(0,0,255), 'BLUE', 3)
 magenta = LEDColor(Color(0,255,255), 'MAGENTA', 4)
-off = LEDColor(Color(0,0,0), 'OFF', 5)
+off = LEDColor(Color(0,0,0), 'OFF', -999999)
 
 def redrawColor(ledColor, removeEnd, strip):
     if removeEnd:
@@ -61,11 +64,11 @@ def redrawColor(ledColor, removeEnd, strip):
     # Light up all full rows of color
     for row in range(0, ledColor.row):
         for col in range(0, colMax):
-            drawColor(row, col, strip, ledColor)
+            drawColor(row, col, strip, ledColor, False)
 
     # Light up remaining lights in last row
     for col in range(0, ledColor.col):
-        drawColor(ledColor.row, col, strip, ledColor)
+        drawColor(ledColor.row, col, strip, ledColor, False)
 
     # Turn off the rest of lights in last row
     for col in range(ledColor.col, colMax):
@@ -98,10 +101,11 @@ def calculateOffset(ledColor):
     # return total of yellow, red, green, and blue rows
     return offset
 
-def drawColor(row, col, strip, ledColor, wait_ms=50):
+def drawColor(row, col, strip, ledColor, clear = True, wait_ms=50):
+    print 'Redrawing ', ledColor
     offset = calculateOffset(ledColor)
     strip.setPixelColor(matrix[row + offset][col], ledColor.color)
-    if ledColor.col is 0:
+    if ledColor.col is 0 and clear:
         # Clear rest of the colors for this new row
         for i in range(1, colMax):
             strip.setPixelColor(matrix[row + offset][i], off.color)
@@ -155,7 +159,7 @@ def add(ledColor, strip):
 # Removes a color from the LED strip. Returns resulting data about this color as a dictionary
 #
 def remove(ledColor, strip):
-    print 'remote ', ledColor, ' at ', matrix[ledColor.row][ledColor.col]
+    print 'remove ', ledColor, ' at ', matrix[ledColor.row][ledColor.col]
     if not ledColor.isLit():
         return
     removedRow = ledColor.decrement()
