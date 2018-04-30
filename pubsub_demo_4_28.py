@@ -98,19 +98,6 @@ class LEDColor:
     def isLit(self):
         return self.row != 0 or self.col != 0
 
-    # def drawNextColorsAfterRemovingRow(self):
-    #     if red.isLit():
-    #         for col in range(0, colMax):
-    #             print 'clearing red row at ', red.row
-    #             drawColor(red.row, col, strip, off)
-    #         redrawRed()
-
-    #     if green.isLit():
-    #         for col in range(0, colMax):
-    #             print 'clearing green row at ', green.row
-    #             drawColor(green.row, col, strip, off)
-    #         redrawGreen()
-
 
 yellow = LEDColor(Color(255,255,0), 'YELLOW')
 red = LEDColor(Color(0,255,0), 'RED')
@@ -121,46 +108,23 @@ off = LEDColor(Color(0,0,0), 'OFF')
 
 # LED MATRIX ANIMATIONS.
 
-# # Draws color after yellow if a row was removed while removing yellow
-# def drawColorsAfterYellow():
-#     if red.isLit():
-#         for col in range(0, colMax):
-#             drawColor(red.row + 1, col, strip, off)
-#         redrawRed()
-#     if green.isLit():
-#         for col in range(0, colMax):
-#             drawColor(green.row + 1, col, strip, off)
-#         redrawGreen()
-
-def redrawRed(removeEnd, strip):
+def redrawColor(ledColor, removeEnd, strip):
     if removeEnd:
         for col in range(0, colMax):
-            strip.setPixelColor(matrix[red.row + calculateOffset(red) + 1][col], off.color)
+            strip.setPixelColor(matrix[ledColor.row + calculateOffset(ledColor) + 1][col], off.color)
 
-    for row in range(0,red.row):
-        for col in range(0,colMax):
-            drawColor(row, col, strip, red)
-
-    for col in range(0,red.col):
-        drawColor(red.row, col, strip, red)
-
-    for col in range(red.col, colMax):
-        strip.setPixelColor(matrix[red.row + calculateOffset(red)][col], off.color)
-
-def redrawGreen(removeEnd, strip):
-    if removeEnd:
+    # Light up all full rows of color
+    for row in range(0, ledColor.row):
         for col in range(0, colMax):
-            strip.setPixelColor(matrix[green.row + calculateOffset(green) + 1][col], off.color)
+            drawColor(row, col, strip, ledColor)
 
-    for row in range(0, green.row):
-        for col in range(0, colMax):
-            drawColor(row, col, strip, green)
+    # Light up remaining lights in last row
+    for col in range(0, ledColor.col):
+        drawColor(ledColor.row, col, strip, ledColor)
 
-    for col in range(0,green.col):
-        drawColor(green.row, col, strip, green)
-
-    for col in range(green.col, colMax):
-        strip.setPixelColor(matrix[green.row + calculateOffset(green)][i], off.color)
+    # Turn off the rest of lights in last row
+    for col in range(ledColor.col, colMax):
+        strip.setPixelColor(matrix[ledColor.row + calculateOffset(ledColor)][col], off.color)
 
 def calculateOffset(ledColor):
     if ledColor == yellow:
@@ -234,13 +198,13 @@ def redrawColors(ledColor, removeEnd, strip):
 
     if ledColor == red:
         if green.isLit():
-            redrawGreen(removeEnd, strip)
+            redrawColor(green, removeEnd, strip)
 
     if ledColor == yellow:
         if red.isLit():
-            redrawRed(removeEnd, strip)
+            redrawColor(red, removeEnd, strip)
         if green.isLit():
-            redrawGreen(removeEnd, strip)
+            redrawColor(green, removeEnd, strip)
 
 def add(ledColor, strip):
     print "adding ", ledColor, " at ", matrix[ledColor.row][ledColor.col]
@@ -251,10 +215,6 @@ def add(ledColor, strip):
     if (ledColor.col == 1):
         redrawColors(ledColor, False, strip)
     strip.show()
-
-
-#------REMOVING COLORS-----------------------------------------------------------------------------------------------
-
 
 def decrementColor(ledColor):
     if ledColor.col == 0 and ledColor.row == 0:
@@ -280,10 +240,6 @@ def remove(ledColor, strip):
         print ledColor, ' row removed, redrawing...'
         redrawColors(ledColor, True, strip)
     strip.show()
-
-
-#------REMOVING COLORS-----------------------------------------------------------------------------------------------
-
 
 #RING ANIMATIONS
 def ringWipe(strip, color, ringNumber, shade, wait_ms=50):
