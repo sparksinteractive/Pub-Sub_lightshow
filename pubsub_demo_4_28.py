@@ -163,7 +163,13 @@ def calculateOffset(ledColor):
 
     offset += green.row + (1 if green.col > 0 else 0)
 
-    # return total of yellow, red, and green rows
+    if ledColor == blue:
+        # return total of yellow, red, and green rows
+        return offset
+
+    offset += blue.row + (1 if blue.col > 0 else 0)
+
+    # return total of yellow, red, green, and blue rows
     return offset
 
 def drawColor(row, col, strip, ledColor, wait_ms=50):
@@ -175,18 +181,26 @@ def drawColor(row, col, strip, ledColor, wait_ms=50):
             strip.setPixelColor(matrix[row + offset][i], off.color)
 
 def redrawColors(ledColor, removeEnd, strip):
-    if ledColor == blue:
+    if ledColor == orange:
         return
+
+    if ledColor == blue:
+        if orange.isLit():
+            redrawColor(orange, removeEnd, strip)
 
     if ledColor == green:
         if blue.isLit():
             redrawColor(blue, removeEnd, strip)
+        if orange.isLit():
+            redrawColor(orange, removeEnd, strip)
 
     if ledColor == red:
         if green.isLit():
             redrawColor(green, removeEnd, strip)
         if blue.isLit():
             redrawColor(blue, removeEnd, strip)
+        if orange.isLit():
+            redrawColor(orange, removeEnd, strip)
 
     if ledColor == yellow:
         if red.isLit():
@@ -195,6 +209,8 @@ def redrawColors(ledColor, removeEnd, strip):
             redrawColor(green, removeEnd, strip)
         if blue.isLit():
             redrawColor(blue, removeEnd, strip)
+        if orange.isLit():
+            redrawColor(orange, removeEnd, strip)
 
 def add(ledColor, strip):
     print "adding ", ledColor, " at ", matrix[ledColor.row][ledColor.col]
@@ -285,15 +301,12 @@ if __name__ == '__main__':
                     else:
                         add(blue, strip)
 
-
-                if clk5State != clk5LastState :
+#---------------ORANGE--------------------------------------------------------------------------------------
+                if clk5State != clk5LastState:
                     if dt5State != clk5State:
-                        colorWipe(strip, Color(0, 0, 0), 'off')
-                        count -= 1
-
-                    if dt5State == clk5State:
-                        colorWipe(strip, Color(255, 255, 0), 'yellow')
-                        count += 1
+                        remove(orange, strip)
+                    else:
+                        add(orange, strip)
 
                 clk1LastState = clk1State
                 clk2LastState = clk2State
