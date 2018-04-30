@@ -19,6 +19,7 @@ class LEDColor:
         self.col = 0
         self.row = 0
         self.id = id
+        self.requestedPosition = 0
 
     def __str__(self):
         return self.name

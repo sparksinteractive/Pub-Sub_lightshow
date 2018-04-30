@@ -91,6 +91,14 @@ def displayColor(color, colorMps):
     for i in range(color.getPosition(), count):
         add(color, strip)
 
+def createMessage(color, isRemoving):
+    if isRemoving and color.requestedPosition > 0:
+        color.requestedPosition -= 1
+    else:
+        color.requestedPosition += 1
+    print 'Requesting ', color, ' at position: ', color.requestedPosition
+    return "{'id': " + str(color.id) + ", 'n': '" + str(color.requestedPosition * messagesPerLed) + "'}"
+
 if __name__ == '__main__':
     deviceClient = DeviceClient(onHandleMessage)
 
@@ -124,44 +132,28 @@ if __name__ == '__main__':
 
         #-----------YELLOW-----------------------------------------------------------------------------------------------
                         if clk1State != clk1LastState:
-                            print 'Received yellow turn'
-                            n = yellow.getPosition()
-                            if dt1State != clk1State:
-                                n -= 1
-                            else:
-                                n += 1
-
-                            message = "{'id': " + str(yellow.id) + ", 'n': '" + str(n * messagesPerLed) + "'}"
-                            print 'Created message: ', message
+                            message = createMessage(yellow, dt1State != clk1State)
                             deviceClient.publish(message)
 
         #-----------RED--------------------------------------------------------------------------------------------------
                         if clk2State != clk2LastState:
-                            if dt2State != clk2State:
-                                remove(red, strip)
-                            else:
-                                add(red, strip)
+                            message = createMessage(red, dt2State != clk2State)
+                            deviceClient.publish(message)
 
         #-----------GREEN------------------------------------------------------------------------------------------------
                         if clk3State != clk3LastState:
-                            if dt3State != clk3State:
-                                remove(green, strip)
-                            else:
-                                add(green, strip)
+                            message = createMessage(green, dt3State != clk3State)
+                            deviceClient.publish(message)
 
         #-----------BLUE-------------------------------------------------------------------------------------------------
                         if clk4State != clk4LastState:
-                            if dt4State != clk4State:
-                                remove(blue, strip)
-                            else:
-                                add(blue, strip)
+                            message = createMessage(blue, dt4State != clk4State)
+                            deviceClient.publish(message)
 
         #-----------MAGENTA----------------------------------------------------------------------------------------------
                         if clk5State != clk5LastState:
-                            if dt5State != clk5State:
-                                remove(magenta, strip)
-                            else:
-                                add(magenta, strip)
+                            message = createMessage(magenta, dt5State != clk5State)
+                            deviceClient.publish(message)
 
                         clk1LastState = clk1State
                         clk2LastState = clk2State
