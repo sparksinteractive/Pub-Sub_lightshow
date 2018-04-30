@@ -98,6 +98,25 @@ class LEDColor:
     def isLit(self):
         return self.row != 0 or self.col != 0
 
+    def increment(self):
+        if self.col < (colMax - 1):
+            self.col += 1
+        else:
+            self.col = 0
+            self.row += 1
+        print self.color, ": ", self.row, self.col
+
+    def decrement(self):
+        if self.col == 0 and self.row == 0:
+            return False
+
+        if self.col == 0:
+            self.col = colMax - 1
+            self.row -= 1
+            return True
+
+        self.col -= 1
+        return self.col == 0 and self.row == 0
 
 yellow = LEDColor(Color(255,255,0), 'YELLOW')
 red = LEDColor(Color(0,255,0), 'RED')
@@ -138,7 +157,7 @@ def calculateOffset(ledColor):
 
     offset += red.row + (1 if red.col > 0 else 0)
 
-    #return total of yellow and red rows
+    # return total of yellow and red rows
     return offset
 
 def drawColor(row, col, strip, ledColor, wait_ms=50):
@@ -148,49 +167,6 @@ def drawColor(row, col, strip, ledColor, wait_ms=50):
         # Clear rest of the colors for this new row
         for i in range(1, colMax):
             strip.setPixelColor(matrix[row + offset][i], off.color)
-
-def incrementYellow():
-    global yellow
-    if yellow.col < (colMax - 1):
-        yellow.col += 1
-    else:
-        yellow.col = 0
-        yellow.row += 1
-    print yellow, ": ", yellow.row, yellow.col
-
-def incrementGreen():
-    global green
-    if green.col < (colMax - 1):
-        green.col += 1
-    else:
-        green.col = 0
-        green.row += 1
-    print green, ": ", green.row, green.col
-
-def incrementRed():
-    global red
-    if red.col < (colMax - 1):
-        red.col += 1
-    else:
-        red.col = 0
-        red.row += 1
-    print red, ": ", red.row, red.col
-
-def incrementColor(ledColor):
-    switcher = {
-        yellow: incrementYellow,
-        red: incrementRed,
-        green: incrementGreen
-    }
-    return switcher.get(ledColor)()
-
-def decrementGreen():
-    global green
-    if green.col == 0:
-        green.col = colMax - 1
-        green.row -= 1
-    else:
-        green.col -= 1
 
 def redrawColors(ledColor, removeEnd, strip):
     if ledColor == green:
@@ -211,27 +187,17 @@ def add(ledColor, strip):
     if ledColor.row > rowMax - 1:
         return
     drawColor(ledColor.row, ledColor.col, strip, ledColor)
-    incrementColor(ledColor)
+    ledColor.increment()
     if (ledColor.col == 1):
         redrawColors(ledColor, False, strip)
     strip.show()
 
-def decrementColor(ledColor):
-    if ledColor.col == 0 and ledColor.row == 0:
-        return False
-
-    if ledColor.col == 0:
-        ledColor.col = colMax - 1
-        ledColor.row -= 1
-        return True
-    ledColor.col -= 1
-    return ledColor.col == 0 and ledColor.row == 0
 
 def remove(ledColor, strip):
     print 'remote ', ledColor, ' at ', matrix[ledColor.row][ledColor.col]
     if not ledColor.isLit():
         return
-    removedRow = decrementColor(ledColor)
+    removedRow = ledColor.decrement()
 
     offset = calculateOffset(ledColor)
     strip.setPixelColor(matrix[ledColor.row + offset][ledColor.col], off.color)
