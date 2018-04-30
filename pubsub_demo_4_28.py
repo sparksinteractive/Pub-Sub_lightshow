@@ -15,14 +15,14 @@ for i in range(0,20):
         for j in range(0,32):
                 matrix[i][j] =val
                 val += 1
-yRow = 0
-yCol = 0
+# yellow.row = 0
+# yellow.col = 0
 
-rRow = 0
-rCol = 0
+# red.row = 0
+# red.col = 0
 
-gRow = 0
-gCol = 0
+# green.row = 0
+# green.col = 0
 
 colMax = 32
 rowMax = 4
@@ -89,9 +89,28 @@ class LEDColor:
     def __init__(self, color, name):
         self.color = color
         self.name = name
+        self.col = 0
+        self.row = 0
 
     def __str__(self):
         return self.name
+
+    def isLit(self):
+        return self.row != 0 or self.col != 0
+
+    # def drawNextColorsAfterRemovingRow(self):
+    #     if red.isLit():
+    #         for col in range(0, colMax):
+    #             print 'clearing red row at ', red.row
+    #             drawColor(red.row, col, strip, off)
+    #         redrawRed()
+
+    #     if green.isLit():
+    #         for col in range(0, colMax):
+    #             print 'clearing green row at ', green.row
+    #             drawColor(green.row, col, strip, off)
+    #         redrawGreen()
+
 
 yellow = LEDColor(Color(255,255,0), 'YELLOW')
 red = LEDColor(Color(0,255,0), 'RED')
@@ -102,68 +121,96 @@ off = LEDColor(Color(0,0,0), 'OFF')
 
 # LED MATRIX ANIMATIONS.
 
-def hasRed():
-    return rRow != 0 or rCol != 0
+# # Draws color after yellow if a row was removed while removing yellow
+# def drawColorsAfterYellow():
+#     if red.isLit():
+#         for col in range(0, colMax):
+#             drawColor(red.row + 1, col, strip, off)
+#         redrawRed()
+#     if green.isLit():
+#         for col in range(0, colMax):
+#             drawColor(green.row + 1, col, strip, off)
+#         redrawGreen()
 
-def hasGreen():
-    return gRow != 0 or gCol != 0
+def redrawRed(removeEnd, strip):
+    if removeEnd:
+        for col in range(0, colMax):
+            strip.setPixelColor(matrix[red.row + calculateOffset(red) + 1][col], off.color)
 
-def redrawRed():
-    for row in range(0,rRow):
+    for row in range(0,red.row):
         for col in range(0,colMax):
             drawColor(row, col, strip, red)
-    for col in range(0,rCol):
-        drawColor(rRow, col, strip, red)
 
-def redrawGreen():
-    for row in range(0, gRow):
+    for col in range(0,red.col):
+        drawColor(red.row, col, strip, red)
+
+    for col in range(red.col, colMax):
+        strip.setPixelColor(matrix[red.row + calculateOffset(red)][col], off.color)
+
+def redrawGreen(removeEnd, strip):
+    if removeEnd:
+        for col in range(0, colMax):
+            strip.setPixelColor(matrix[green.row + calculateOffset(green) + 1][col], off.color)
+
+    for row in range(0, green.row):
         for col in range(0, colMax):
             drawColor(row, col, strip, green)
-    for col in range(0, gCol):
-        drawColor(gRow, col, strip, green)
+
+    for col in range(0,green.col):
+        drawColor(green.row, col, strip, green)
+
+    for col in range(green.col, colMax):
+        strip.setPixelColor(matrix[green.row + calculateOffset(green)][i], off.color)
 
 def calculateOffset(ledColor):
-    switcher = {
-        yellow: 0,
-        red: yRow + (1 if yCol > 0 else 0),
-        green: rRow + yRow + (1 if yCol > 0 else 0) + (1 if rCol > 0 else 0),
-    }
-    return switcher.get(ledColor)
+    if ledColor == yellow:
+        return 0
+
+    offset = yellow.row + (1 if yellow.col > 0 else 0);
+
+    if ledColor == red:
+        # return total of yellow rows
+        return offset
+
+    offset += red.row + (1 if red.col > 0 else 0)
+
+    #return total of yellow and red rows
+    return offset
 
 def drawColor(row, col, strip, ledColor, wait_ms=50):
     offset = calculateOffset(ledColor)
     strip.setPixelColor(matrix[row + offset][col], ledColor.color)
-    if col == 0:
+    if ledColor.col is 0:
         # Clear rest of the colors for this new row
         for i in range(1, colMax):
             strip.setPixelColor(matrix[row + offset][i], off.color)
 
 def incrementYellow():
-    global yRow, yCol
-    if yCol < (colMax - 1):
-        yCol += 1
+    global yellow
+    if yellow.col < (colMax - 1):
+        yellow.col += 1
     else:
-        yCol = 0
-        yRow += 1
-    print yellow, ": ", yRow, yCol
+        yellow.col = 0
+        yellow.row += 1
+    print yellow, ": ", yellow.row, yellow.col
 
 def incrementGreen():
-    global gRow, gCol
-    if gCol < (colMax - 1):
-        gCol += 1
+    global green
+    if green.col < (colMax - 1):
+        green.col += 1
     else:
-        gCol = 0
-        gRow += 1
-    print green, ": ", gRow, gCol
+        green.col = 0
+        green.row += 1
+    print green, ": ", green.row, green.col
 
 def incrementRed():
-    global rRow, rCol
-    if rCol < (colMax - 1):
-        rCol += 1
+    global red
+    if red.col < (colMax - 1):
+        red.col += 1
     else:
-        rCol = 0
-        rRow += 1
-    print red, ": ", rRow, rCol
+        red.col = 0
+        red.row += 1
+    print red, ": ", red.row, red.col
 
 def incrementColor(ledColor):
     switcher = {
@@ -174,113 +221,69 @@ def incrementColor(ledColor):
     return switcher.get(ledColor)()
 
 def decrementGreen():
-    global gRow, gCol
-    if gCol == 0:
-        gCol = colMax - 1
-        gRow -= 1
+    global green
+    if green.col == 0:
+        green.col = colMax - 1
+        green.row -= 1
     else:
-        gCol -= 1
+        green.col -= 1
 
-def redrawColors(ledColor):
-    switcher = {
-        yellow: yCol,
-        red: rCol,
-        green: gCol
-    }
-    col = switcher.get(ledColor)
-
-    if (col != 1):
-        return
-
+def redrawColors(ledColor, removeEnd, strip):
     if ledColor == green:
         return
-    if hasGreen():
-        redrawGreen()
 
     if ledColor == red:
+        if green.isLit():
+            redrawGreen(removeEnd, strip)
+
+    if ledColor == yellow:
+        if red.isLit():
+            redrawRed(removeEnd, strip)
+        if green.isLit():
+            redrawGreen(removeEnd, strip)
+
+def add(ledColor, strip):
+    print "adding ", ledColor, " at ", matrix[ledColor.row][ledColor.col]
+    if ledColor.row > rowMax - 1:
         return
-    if hasRed():
-        redrawRed()
-
-
-#------ADDING COLORS-----------------------------------------------------------------------------------------------
-
-
-def add(ledColor, row, col, strip):
-    print "adding ", ledColor, " at ", matrix[row][col]
-    if row > rowMax - 1:
-        return
-    drawColor(row, col, strip, ledColor)
+    drawColor(ledColor.row, ledColor.col, strip, ledColor)
     incrementColor(ledColor)
-    redrawColors(ledColor)
+    if (ledColor.col == 1):
+        redrawColors(ledColor, False, strip)
     strip.show()
 
 
-#------ADDING COLORS-----------------------------------------------------------------------------------------------
+#------REMOVING COLORS-----------------------------------------------------------------------------------------------
 
 
-def removeYellow(strip, color, wait_ms=50):
-    global yRow, yCol
-    print 'remove yellow at: ', matrix[yRow][yCol]
+def decrementColor(ledColor):
+    if ledColor.col == 0 and ledColor.row == 0:
+        return False
 
-    removedRow = False
-    if yRow <= 0 and yCol <= 0:
+    if ledColor.col == 0:
+        ledColor.col = colMax - 1
+        ledColor.row -= 1
+        return True
+    ledColor.col -= 1
+    return ledColor.col == 0 and ledColor.row == 0
+
+def remove(ledColor, strip):
+    print 'remote ', ledColor, ' at ', matrix[ledColor.row][ledColor.col]
+    if not ledColor.isLit():
         return
-    else:
-        if yCol == 0:
-            yCol = colMax - 1
-            yRow -= 1
-            removedRow = True
-        else:
-            yCol -= 1
-            removedRow = yCol == 0 and yRow == 0
-        strip.setPixelColor(matrix[yRow][yCol], color)
+    removedRow = decrementColor(ledColor)
 
-    if removedRow and (rCol != 0 or rRow != 0):
-        for col in range(0,colMax):
-            drawColor(rRow + 1, col, strip, off)
-        redrawRed()
+    offset = calculateOffset(ledColor)
+    strip.setPixelColor(matrix[ledColor.row + offset][ledColor.col], off.color)
+
+    if removedRow:
+        print ledColor, ' row removed, redrawing...'
+        redrawColors(ledColor, True, strip)
     strip.show()
 
-def removeRed(strip, color, wait_ms=50):
-    global rRow, rCol
-    print 'remove red at: ', matrix[rRow][rCol]
 
-    removedRow = False
-    if rRow <= 0 and rCol <= 0:
-        return
-    if rCol == 0:
-        rCol = colMax -1
-        rRow -= 1
-        removedRow = True
-    else:
-        rCol -= 1
-        removedRow = rCol == 0 and rRow == 0
+#------REMOVING COLORS-----------------------------------------------------------------------------------------------
 
-    if removedRow and hasGreen():
-        for col in range(0,colMax):
-            drawColor(gRow + 1, col, strip, off)
-        redrawGreen()
-
-    rRowRemove = rRow + yRow
-    if (yCol > 0):
-        rRowRemove += 1
-    strip.setPixelColor(matrix[rRowRemove][rCol], color)
-    strip.show()
-
-def removeGreen(strip, color, wait_ms=50):
-    global gRow, gCol
-    print 'remove green at: ', matrix[gRow][gCol]
-    if gRow <= 0 and gCol <= 0:
-        return
-    decrementGreen()
-    rowToRemove = gRow + rRow + yRow
-    if rCol > 0:
-        rowToRemove += 1
-    if yCol > 0:
-        rowToRemove += 1
-    strip.setPixelColor(matrix[rowToRemove][gCol], color)
-    strip.show()
 
 #RING ANIMATIONS
 def ringWipe(strip, color, ringNumber, shade, wait_ms=50):
@@ -321,22 +324,22 @@ if __name__ == '__main__':
 #------YELLOW-----------------------------------------------------------------------------------------------
                 if clk1State != clk1LastState:
                     if dt1State != clk1State:
-                        removeYellow(strip, Color(0,0,0))
+                        remove(yellow, strip)
                     else:
-                        add(yellow, yRow, yCol, strip)
+                        add(yellow, strip)
 
 #------------RED------------------------------------------------------------------------------------------
                 if clk2State != clk2LastState:
                     if dt2State != clk2State:
-                        removeRed(strip, Color(0, 0, 0))
+                        remove(red, strip)
                     else:
-                        add(red, rRow, rCol, strip)
+                        add(red, strip)
 #---------------GREEN--------------------------------------------------------------------------------------
                 if clk3State != clk3LastState:
                     if dt3State != clk3State:
-                        removeGreen(strip, Color(0, 0, 0))
+                        remove(green, strip)
                     else:
-                        add(green, gRow, gCol, strip)
+                        add(green, strip)
 
                 if clk4State != clk4LastState:
                     if dt4State != clk4State:
