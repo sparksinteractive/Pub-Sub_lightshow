@@ -77,7 +77,7 @@ yellowCount = 0
 redCount = 0
 greenCount = 0
 blueCount = 0
-orangeCount = 0
+magentaCount = 0
 
 clk1LastState = GPIO.input(clk1)
 clk2LastState = GPIO.input(clk2)
@@ -122,7 +122,7 @@ yellow = LEDColor(Color(255,255,0), 'YELLOW')
 red = LEDColor(Color(0,255,0), 'RED')
 green = LEDColor(Color(255,0,0), 'GREEN')
 blue = LEDColor(Color(0,0,255), 'BLUE')
-orange = LEDColor(Color(165,255,0), 'ORANGE')
+magenta = LEDColor(Color(0,255,255), 'MAGENTA')
 off = LEDColor(Color(0,0,0), 'OFF')
 
 # LED MATRIX ANIMATIONS.
@@ -181,26 +181,26 @@ def drawColor(row, col, strip, ledColor, wait_ms=50):
             strip.setPixelColor(matrix[row + offset][i], off.color)
 
 def redrawColors(ledColor, removeEnd, strip):
-    if ledColor == orange:
+    if ledColor == magenta:
         return
 
     if ledColor == blue:
-        if orange.isLit():
-            redrawColor(orange, removeEnd, strip)
+        if magenta.isLit():
+            redrawColor(magenta, removeEnd, strip)
 
     if ledColor == green:
         if blue.isLit():
             redrawColor(blue, removeEnd, strip)
-        if orange.isLit():
-            redrawColor(orange, removeEnd, strip)
+        if magenta.isLit():
+            redrawColor(magenta, removeEnd, strip)
 
     if ledColor == red:
         if green.isLit():
             redrawColor(green, removeEnd, strip)
         if blue.isLit():
             redrawColor(blue, removeEnd, strip)
-        if orange.isLit():
-            redrawColor(orange, removeEnd, strip)
+        if magenta.isLit():
+            redrawColor(magenta, removeEnd, strip)
 
     if ledColor == yellow:
         if red.isLit():
@@ -209,8 +209,8 @@ def redrawColors(ledColor, removeEnd, strip):
             redrawColor(green, removeEnd, strip)
         if blue.isLit():
             redrawColor(blue, removeEnd, strip)
-        if orange.isLit():
-            redrawColor(orange, removeEnd, strip)
+        if magenta.isLit():
+            redrawColor(magenta, removeEnd, strip)
 
 def add(ledColor, strip):
     print "adding ", ledColor, " at ", matrix[ledColor.row][ledColor.col]
@@ -273,40 +273,40 @@ if __name__ == '__main__':
                 clk5State = GPIO.input(clk5)
                 dt5State = GPIO.input(dt5)
 
-#------YELLOW-----------------------------------------------------------------------------------------------
+#-----------YELLOW-----------------------------------------------------------------------------------------------
                 if clk1State != clk1LastState:
                     if dt1State != clk1State:
                         remove(yellow, strip)
                     else:
                         add(yellow, strip)
 
-#------------RED------------------------------------------------------------------------------------------
+#-----------RED--------------------------------------------------------------------------------------------------
                 if clk2State != clk2LastState:
                     if dt2State != clk2State:
                         remove(red, strip)
                     else:
                         add(red, strip)
 
-#---------------GREEN--------------------------------------------------------------------------------------
+#-----------GREEN------------------------------------------------------------------------------------------------
                 if clk3State != clk3LastState:
                     if dt3State != clk3State:
                         remove(green, strip)
                     else:
                         add(green, strip)
 
-#---------------BLUE--------------------------------------------------------------------------------------
+#-----------BLUE-------------------------------------------------------------------------------------------------
                 if clk4State != clk4LastState:
                     if dt4State != clk4State:
                         remove(blue, strip)
                     else:
                         add(blue, strip)
 
-#---------------ORANGE--------------------------------------------------------------------------------------
+#-----------MAGENTA----------------------------------------------------------------------------------------------
                 if clk5State != clk5LastState:
                     if dt5State != clk5State:
-                        remove(orange, strip)
+                        remove(magenta, strip)
                     else:
-                        add(orange, strip)
+                        add(magenta, strip)
 
                 clk1LastState = clk1State
                 clk2LastState = clk2State
