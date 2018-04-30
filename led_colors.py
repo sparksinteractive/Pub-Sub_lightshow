@@ -13,11 +13,12 @@ colMax = 32
 rowMax = 4
 
 class LEDColor:
-    def __init__(self, color, name):
+    def __init__(self, color, name, id):
         self.color = color
         self.name = name
         self.col = 0
         self.row = 0
+        self.id = id
 
     def __str__(self):
         return self.name
@@ -45,12 +46,12 @@ class LEDColor:
         self.col -= 1
         return self.col == 0 and self.row == 0
 
-yellow = LEDColor(Color(255,255,0), 'YELLOW')
-red = LEDColor(Color(0,255,0), 'RED')
-green = LEDColor(Color(255,0,0), 'GREEN')
-blue = LEDColor(Color(0,0,255), 'BLUE')
-magenta = LEDColor(Color(0,255,255), 'MAGENTA')
-off = LEDColor(Color(0,0,0), 'OFF')
+yellow = LEDColor(Color(255,255,0), 'YELLOW', 0)
+red = LEDColor(Color(0,255,0), 'RED', 1)
+green = LEDColor(Color(255,0,0), 'GREEN', 2)
+blue = LEDColor(Color(0,0,255), 'BLUE', 3)
+magenta = LEDColor(Color(0,255,255), 'MAGENTA', 4)
+off = LEDColor(Color(0,0,0), 'OFF', 5)
 
 def redrawColor(ledColor, removeEnd, strip):
     if removeEnd:
@@ -137,6 +138,9 @@ def redrawColors(ledColor, removeEnd, strip):
         if magenta.isLit():
             redrawColor(magenta, removeEnd, strip)
 
+#
+# Adds a color to the LED strip. Returns resulting data about this color as a dictionary
+#
 def add(ledColor, strip):
     print "adding ", ledColor, " at ", matrix[ledColor.row][ledColor.col]
     if ledColor.row > rowMax - 1:
@@ -147,7 +151,9 @@ def add(ledColor, strip):
         redrawColors(ledColor, False, strip)
     strip.show()
 
-
+#
+# Removes a color from the LED strip. Returns resulting data about this color as a dictionary
+#
 def remove(ledColor, strip):
     print 'remote ', ledColor, ' at ', matrix[ledColor.row][ledColor.col]
     if not ledColor.isLit():
