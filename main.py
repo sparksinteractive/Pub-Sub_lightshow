@@ -92,12 +92,15 @@ def displayColor(color, colorMps):
         add(color, strip)
 
 def createMessage(color, isRemoving):
-    if isRemoving and color.requestedPosition > 0:
+    if isRemoving:
         color.requestedPosition -= 1
     else:
         color.requestedPosition += 1
     print 'Requesting ', color, ' at position: ', color.requestedPosition
     return "{'id': " + str(color.id) + ", 'n': '" + str(color.requestedPosition * messagesPerLed) + "'}"
+
+def isOutOfBounds(color, isRemoving):
+    return (isRemoving and color.requestedPosition <= 0) or (not isRemoving and color.requestedPosition >= 127)
 
 if __name__ == '__main__':
     deviceClient = DeviceClient(onHandleMessage)
@@ -132,28 +135,43 @@ if __name__ == '__main__':
 
         #-----------YELLOW-----------------------------------------------------------------------------------------------
                         if clk1State != clk1LastState:
-                            message = createMessage(yellow, dt1State != clk1State)
-                            deviceClient.publish(message)
+                            isRemoving = dt1State != clk1State
+                            if not isOutOfBounds(yellow, isRemoving):
+                                message = createMessage(yellow, isRemoving)
+                                print 'Sending message: ', message
+                                deviceClient.publish(message)
 
         #-----------RED--------------------------------------------------------------------------------------------------
                         if clk2State != clk2LastState:
-                            message = createMessage(red, dt2State != clk2State)
-                            deviceClient.publish(message)
+                            isRemoving = dt2State != clk2State
+                            if not isOutOfBounds(red, isRemoving):
+                                message = createMessage(red, isRemoving)
+                                print 'Sending message: ', message
+                                deviceClient.publish(message)
 
         #-----------GREEN------------------------------------------------------------------------------------------------
                         if clk3State != clk3LastState:
-                            message = createMessage(green, dt3State != clk3State)
-                            deviceClient.publish(message)
+                            isRemoving = dt3State != clk3State
+                            if not isOutOfBounds(green, isRemoving):
+                                message = createMessage(green, isRemoving)
+                                print 'Sending message: ', message
+                                deviceClient.publish(message)
 
         #-----------BLUE-------------------------------------------------------------------------------------------------
                         if clk4State != clk4LastState:
-                            message = createMessage(blue, dt4State != clk4State)
-                            deviceClient.publish(message)
+                            isRemoving = dt4State != clk4State
+                            if not isOutOfBounds(blue, isRemoving):
+                                message = createMessage(blue, isRemoving)
+                                print 'Sending message: ', message
+                                deviceClient.publish(message)
 
         #-----------MAGENTA----------------------------------------------------------------------------------------------
                         if clk5State != clk5LastState:
-                            message = createMessage(magenta, dt5State != clk5State)
-                            deviceClient.publish(message)
+                            isRemoving = dt5State != clk5State
+                            if not isOutOfBounds(magenta, isRemoving):
+                                message = createMessage(magenta, isRemoving)
+                                print 'Sending message: ', message
+                                deviceClient.publish(message)
 
                         clk1LastState = clk1State
                         clk2LastState = clk2State
