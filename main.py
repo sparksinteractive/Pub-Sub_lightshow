@@ -72,6 +72,7 @@ def ringWipe(strip, color, ringNumber, shade, wait_ms=50):
     ring.setPixelColor(ringNumber, color)
 
 def onHandleMessage(data):
+    """Handles messages received from IoT Core about metrics"""
     print 'Received data: ', data
     mps = data['mps']
     displayColor(yellow, int(mps[0]))
@@ -81,6 +82,7 @@ def onHandleMessage(data):
     displayColor(magenta, int(mps[4]))
 
 def displayColor(color, colorMps):
+    """Helps handle message function add and remove LED colors"""
     count = colorMps / messagesPerLed
     if color.getPosition() > count:
         for i in range(count, color.getPosition()):
@@ -103,64 +105,75 @@ if __name__ == '__main__':
     ring.begin()
     print ('Press Ctrl-C to quit.')
 
-    i = 0
-    while True is True:
-        if not args.clear:
-            print('Use "-c" argument to clear LEDs on exit')
-            try:
-                while True:
-                    clk1State = GPIO.input(clk1)
-                    dt1State = GPIO.input(dt1)
-                    clk2State = GPIO.input(clk2)
-                    dt2State = GPIO.input(dt2)
-                    clk3State = GPIO.input(clk3)
-                    dt3State = GPIO.input(dt3)
-                    clk4State = GPIO.input(clk4)
-                    dt4State = GPIO.input(dt4)
-                    clk5State = GPIO.input(clk5)
-                    dt5State = GPIO.input(dt5)
+    try:
+        while True:
+            if not args.clear:
+                print('Use "-c" argument to clear LEDs on exit')
+                try:
+                    while True:
+                        clk1State = GPIO.input(clk1)
+                        dt1State = GPIO.input(dt1)
+                        clk2State = GPIO.input(clk2)
+                        dt2State = GPIO.input(dt2)
+                        clk3State = GPIO.input(clk3)
+                        dt3State = GPIO.input(dt3)
+                        clk4State = GPIO.input(clk4)
+                        dt4State = GPIO.input(dt4)
+                        clk5State = GPIO.input(clk5)
+                        dt5State = GPIO.input(dt5)
 
-    #-----------YELLOW-----------------------------------------------------------------------------------------------
-                    if clk1State != clk1LastState:
-                        deviceClient.publish("{'id': " + str(yellow.id) + ", 'n': '" + str(messagesPerLed) + "'}")
+        #-----------YELLOW-----------------------------------------------------------------------------------------------
+                        if clk1State != clk1LastState:
+                            print 'Received yellow turn'
+                            n = yellow.getPosition()
+                            if dt1State != clk1State:
+                                n -= 1
+                            else:
+                                n += 1
 
-    #-----------RED--------------------------------------------------------------------------------------------------
-                    if clk2State != clk2LastState:
-                        if dt2State != clk2State:
-                            remove(red, strip)
-                        else:
-                            add(red, strip)
+                            message = "{'id': " + str(yellow.id) + ", 'n': '" + str(n * messagesPerLed) + "'}"
+                            print 'Created message: ', message
+                            deviceClient.publish(message)
 
-    #-----------GREEN------------------------------------------------------------------------------------------------
-                    if clk3State != clk3LastState:
-                        if dt3State != clk3State:
-                            remove(green, strip)
-                        else:
-                            add(green, strip)
+        #-----------RED--------------------------------------------------------------------------------------------------
+                        if clk2State != clk2LastState:
+                            if dt2State != clk2State:
+                                remove(red, strip)
+                            else:
+                                add(red, strip)
 
-    #-----------BLUE-------------------------------------------------------------------------------------------------
-                    if clk4State != clk4LastState:
-                        if dt4State != clk4State:
-                            remove(blue, strip)
-                        else:
-                            add(blue, strip)
+        #-----------GREEN------------------------------------------------------------------------------------------------
+                        if clk3State != clk3LastState:
+                            if dt3State != clk3State:
+                                remove(green, strip)
+                            else:
+                                add(green, strip)
 
-    #-----------MAGENTA----------------------------------------------------------------------------------------------
-                    if clk5State != clk5LastState:
-                        if dt5State != clk5State:
-                            remove(magenta, strip)
-                        else:
-                            add(magenta, strip)
+        #-----------BLUE-------------------------------------------------------------------------------------------------
+                        if clk4State != clk4LastState:
+                            if dt4State != clk4State:
+                                remove(blue, strip)
+                            else:
+                                add(blue, strip)
 
-                    clk1LastState = clk1State
-                    clk2LastState = clk2State
-                    clk3LastState = clk3State
-                    clk4LastState = clk4State
-                    clk5LastState = clk5State
-            except KeyboardInterrupt:
-                if args.clear:
-                    colorWipe(strip, Color(0,0,0), 10)
+        #-----------MAGENTA----------------------------------------------------------------------------------------------
+                        if clk5State != clk5LastState:
+                            if dt5State != clk5State:
+                                remove(magenta, strip)
+                            else:
+                                add(magenta, strip)
 
-            finally:
-                GPIO.cleanup()
+                        clk1LastState = clk1State
+                        clk2LastState = clk2State
+                        clk3LastState = clk3State
+                        clk4LastState = clk4State
+                        clk5LastState = clk5State
+                except KeyboardInterrupt:
+                    if args.clear:
+                        colorWipe(strip, Color(0,0,0), 10)
+
+                finally:
+                    GPIO.cleanup()
+    finally:
+        deviceClient.stop()
 

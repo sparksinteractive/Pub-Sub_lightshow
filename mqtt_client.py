@@ -97,13 +97,16 @@ class DeviceClient(object):
         self.client.on_message = self.callback.on_message
 
     def publish(self, payload):
+        """Sends message to IoT Core"""
         self.client.publish(_MQTT_TOPIC, payload, qos=1)
 
     def begin(self):
+        """Starts IoT core connection"""
         self.client.connect(_CLIENT_CONN_HOSTNAME, _CLIENT_CONN_PORT)
         self.client.subscribe(_MQTT_CONFIG_TOPIC, qos=1)
         self.client.loop_start()
 
     def stop(self):
+        """Stops IoT core connection"""
         self.client.loop_stop()
 

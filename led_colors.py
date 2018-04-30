@@ -57,6 +57,7 @@ magenta = LEDColor(Color(0,255,255), 'MAGENTA', 4)
 off = LEDColor(Color(0,0,0), 'OFF', -999999)
 
 def redrawColor(ledColor, removeEnd, strip):
+    # If removing a color remove a row, then remove the. excess row color at the end
     if removeEnd:
         for col in range(0, colMax):
             strip.setPixelColor(matrix[ledColor.row + calculateOffset(ledColor) + 1][col], off.color)
