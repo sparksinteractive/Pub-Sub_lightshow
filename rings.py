@@ -1,52 +1,91 @@
 from neopixel import *
 from main import LED_FREQ_HZ, LED_DMA, LED_BRIGHTNESS, LED_INVERT
 
+YELLOW_COLOR  = Color(255,255,0)
+RED_COLOR     = Color(0,255,0)
+GREEN_COLOR   = Color(255,0,0)
+BLUE_COLOR    = Color(0,0,255)
+MAGENTA_COLOR = Color(0,255,255)
+
 RING            = 13
 RING_CHANNEL    = 1
 RING_COUNT      = 48
-ZIGZAG          = 19
 KNOB_INCREMENTS = 5
 
-ring = Adafruit_NeoPixel(RING_COUNT, RING, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, RING_CHANNEL)
-zigzag = Adafruit_NeoPixel(RING_COUNT, ZIGZAG, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, RING_CHANNEL)
+# ZIGZAG     = 19
+ZIGZAG_MAX = 24
 
-def ringWipe(ledRing, isOn, wait_ms=50):
-    print 'Ring: Adding', ledRing.name, 'at ', ledRing.pos
-    colorToUse = ledRing.color if isOn else Color(0, 0, 0)
-    ring.setPixelColor(ledRing.pos, colorToUse)
-    ring.show()
+ring = Adafruit_NeoPixel(RING_COUNT, RING, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, RING_CHANNEL)
+# zigzag = Adafruit_NeoPixel(RING_COUNT, ZIGZAG, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, RING_CHANNEL)
+
+def ringWipe(ringColor, isOn, wait_ms=50):
+    print 'Ring: ', isOn, ' for ', ringColor.name, 'at ', ringColor.pos
+    colorToUse = ringColor.color if isOn else Color(0, 0, 0)
+    ring.setPixelColor(ringColor.pos, colorToUse)
+    if ringColor.pos == 0:
+        zigzagWipe(ringColor.zigzag, isOn)
+
+def zigzagWipe(zigzag, isOn, wait_ms=50):
+    print 'Zigzag: ', 'turning ON ' if isOn else 'turning OFF ', ' for ', zigzag.name, 'at ', zigzag.pos
+    colorToUse = zigzag.color if isOn else Color(0, 0, 0)
+    for i in range(zigzag.pos, zigzag.pos + ZIGZAG_MAX):
+        ring.setPixelColor(i, colorToUse)
+
+class Zigzag:
+    def __init__(self, color, name, startPos):
+        self.color = color
+        self.name = name
+        self.on = False
+        self.pos = 0 + startPos
+
+    def __str__(self):
+        return self.name
+
+    def setOn(self, isOn):
+        self.on = isOn
+        zigzagWipe(self, self.on)
+
+yellowZigzag = Zigzag(YELLOW_COLOR, "YELLOW", 24)
+redZigzag = Zigzag(RED_COLOR, "RED", 144)
+greenZigzag = Zigzag(GREEN_COLOR, "GREEN", 168)
+blueZigzag = Zigzag(BLUE_COLOR, "BLUE", 192)
+magentaZigzag = Zigzag(MAGENTA_COLOR, "MAGENTA", 216)
 
 class Ring:
-    def __init__(self, color, name, startPos):
+    def __init__(self, color, name, startPos, zigzag):
         self.color = color
         self.name = name
         self.pos = 0 + startPos
         self.knob = 0
+        self.zigzag = zigzag
 
     def __str__(self):
         return self.name
 
     def knobForward(self):
-        print('Moving forward ', self.name, ' with pos ', self.pos)
-        if self.knob >= 128:
+        if self.knob >= 128 or self.pos >= 24:
             return
+        print 'Moving forward ', self.name, ' with pos ', self.pos, ' and knob ', self.knob
         self.knob += 1
         if self.knob % KNOB_INCREMENTS == 0:
+            ringWipe(self, True)
             self.pos += 1
-        ringWipe(self, True)
+            ring.show()
 
     def knobBack(self):
-        print 'Moving back ', self.name, ' with pos ', self.pos
-        ringWipe(self, False)
-        if self.knob <= 0:
+        if self.knob <= 0 or self.pos < 0:
             return
+        print 'Moving back ', self.name, ' with pos ', self.pos, ' and knob ', self.knob
         self.knob -= 1
         if self.knob % KNOB_INCREMENTS == 0:
-            self.pos -= 1
+            ringWipe(self, False)
+            if self.pos > 0:
+                self.pos -= 1
+            ring.show()
 
 
-yellowRing = Ring(Color(255,255,0), "YELLOW", 0)
-redRing = Ring(Color(0,255,0), "RED", 24)
-greenRing = Ring(Color(255,0,0), "GREEN", 48)
-blueRing = Ring(Color(0,0,255), "BLUE", 72)
-magentaRing = Ring(Color(0,255,255), "MAGENTA", 96)
+yellowRing = Ring(YELLOW_COLOR, "YELLOW", 0, yellowZigzag)
+redRing = Ring(RED_COLOR, "RED", 24, redZigzag)
+greenRing = Ring(GREEN_COLOR, "GREEN", 48, greenZigzag)
+blueRing = Ring(BLUE_COLOR, "BLUE", 72, blueZigzag)
+magentaRing = Ring(MAGENTA_COLOR, "MAGENTA", 96, magentaZigzag)
