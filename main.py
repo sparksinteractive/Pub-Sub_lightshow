@@ -8,6 +8,7 @@ from RPi import GPIO
 from time import sleep
 from led_colors import *
 from mqtt_client import *
+from rings import *
 
 # encoder config
 clk1 = 17
@@ -16,7 +17,7 @@ dt1 = 27
 clk2 = 5
 dt2 = 6
 
-clk3 = 13
+clk3 = 24
 dt3 = 25
 
 clk4 = 26
@@ -30,17 +31,14 @@ ring2 = 24
 
 # LED strip configuration:
 LED_COUNT    = 300      # Number of LED pixels.
-LED_PIN        = 12      # GPIO pin connected to the pixels (18 uses PWM!).
-RING_COUNT     = 48
-RING          = 19
+LED_PIN      = 12      # GPIO pin connected to the pixels (18 uses PWM!).
 
 #LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
 LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA        = 10      # DMA channel to use for generating signal (try 10)
-LED_BRIGHTNESS    = 20     # Set to 0 for darkest and 255 for brightest
-LED_INVERT    = False   # True to invert the signal (when using NPN transistor level shift)
-LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
-RING_CHANNEL    = 1
+LED_BRIGHTNESS = 20     # Set to 0 for darkest and 255 for brightest
+LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
+LED_CHANNEL    = 0       #set to "0" for 12 and 18\
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(clk1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
@@ -64,17 +62,12 @@ messagesPerLed = 1562
 
 # Create NeoPixel object with appropriate configuration.
 strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
-ring = Adafruit_NeoPixel(RING_COUNT, RING, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, RING_CHANNEL)
-
-# RING ANIMATIONS
-def ringWipe(strip, color, ringNumber, shade, wait_ms=50):
-    print 'Ring: Adding', shade, 'at ', ring1
-    ring.setPixelColor(ringNumber, color)
 
 def onHandleMessage(data):
     """Handles messages received from IoT Core about metrics"""
     print 'Received data: ', data
     mps = data['mps']
+    total = data['total']
     displayColor(yellow, int(mps[0]))
     displayColor(red, int(mps[1]))
     displayColor(green, int(mps[2]))
@@ -96,7 +89,7 @@ def createMessage(color, isRemoving):
         color.requestedPosition -= 1
     else:
         color.requestedPosition += 1
-    print 'Requesting ', color, ' at position: ', color.requestedPosition
+    # print 'Requesting ', color, ' at position: ', color.requestedPosition
     return "{'id': " + str(color.id) + ", 'n': '" + str(color.requestedPosition * messagesPerLed) + "'}"
 
 def isOutOfBounds(color, isRemoving):
@@ -136,41 +129,61 @@ if __name__ == '__main__':
         #-----------YELLOW-----------------------------------------------------------------------------------------------
                         if clk1State != clk1LastState:
                             isRemoving = dt1State != clk1State
+                            if isRemoving:
+                                yellowRing.knobBack()
+                            else:
+                                yellowRing.knobForward()
                             if not isOutOfBounds(yellow, isRemoving):
                                 message = createMessage(yellow, isRemoving)
-                                print 'Sending message: ', message
+                                # print 'Sending message: ', message
                                 deviceClient.publish(message)
 
         #-----------RED--------------------------------------------------------------------------------------------------
                         if clk2State != clk2LastState:
                             isRemoving = dt2State != clk2State
+                            if isRemoving:
+                                redRing.knobBack()
+                            else:
+                                redRing.knobForward()
                             if not isOutOfBounds(red, isRemoving):
                                 message = createMessage(red, isRemoving)
-                                print 'Sending message: ', message
+                                # print 'Sending message: ', message
                                 deviceClient.publish(message)
 
         #-----------GREEN------------------------------------------------------------------------------------------------
                         if clk3State != clk3LastState:
                             isRemoving = dt3State != clk3State
+                            if isRemoving:
+                                greenRing.knobBack()
+                            else:
+                                greenRing.knobForward()
                             if not isOutOfBounds(green, isRemoving):
                                 message = createMessage(green, isRemoving)
-                                print 'Sending message: ', message
+                                # print 'Sending message: ', message
                                 deviceClient.publish(message)
 
         #-----------BLUE-------------------------------------------------------------------------------------------------
                         if clk4State != clk4LastState:
                             isRemoving = dt4State != clk4State
+                            if isRemoving:
+                                blueRing.knobBack()
+                            else:
+                                blueRing.knobForward()
                             if not isOutOfBounds(blue, isRemoving):
                                 message = createMessage(blue, isRemoving)
-                                print 'Sending message: ', message
+                                # print 'Sending message: ', message
                                 deviceClient.publish(message)
 
         #-----------MAGENTA----------------------------------------------------------------------------------------------
                         if clk5State != clk5LastState:
                             isRemoving = dt5State != clk5State
+                            if isRemoving:
+                                magentaRing.knobBack()
+                            else:
+                                magentaRing.knobForward()
                             if not isOutOfBounds(magenta, isRemoving):
                                 message = createMessage(magenta, isRemoving)
-                                print 'Sending message: ', message
+                                # print 'Sending message: ', message
                                 deviceClient.publish(message)
 
                         clk1LastState = clk1State
