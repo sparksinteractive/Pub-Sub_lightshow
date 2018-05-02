@@ -35,7 +35,7 @@ LED_PIN      = 12      # GPIO pin connected to the pixels (18 uses PWM!).
 #LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
 LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA        = 10      # DMA channel to use for generating signal (try 10)
-LED_BRIGHTNESS = 20     # Set to 0 for darkest and 255 for brightest
+LED_BRIGHTNESS = 10     # Set to 0 for darkest and 255 for brightest
 LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
 LED_CHANNEL    = 0       #set to "0" for 12 and 18\
 
@@ -105,50 +105,50 @@ if __name__ == '__main__':
                 if clk1State != clk1LastState:
                     isRemoving = dt1State != clk1State
                     if isRemoving:
-                        yellowRing.knobBack()
+#                        yellowRing.knobBack()
                         remove(yellow, strip)
                     else:
-                        yellowRing.knobForward()
+ #                       yellowRing.knobForward()
                         add(yellow, strip)
 
         #-----------RED--------------------------------------------------------------------------------------------------
                 if clk2State != clk2LastState:
                     isRemoving = dt2State != clk2State
                     if isRemoving:
-                        redRing.knobBack()
+#                        redRing.knobBack()
                         remove(red, strip)
                     else:
-                        redRing.knobForward()
+#                        redRing.knobForward()
                         add(red, strip)
 
         #-----------GREEN------------------------------------------------------------------------------------------------
                 if clk3State != clk3LastState:
                     isRemoving = dt3State != clk3State
                     if isRemoving:
-                        greenRing.knobBack()
+ #                       greenRing.knobBack()
                         remove(green, strip)
                     else:
-                        greenRing.knobForward()
+  #                      greenRing.knobForward()
                         add(green, strip)
 
         #-----------BLUE-------------------------------------------------------------------------------------------------
                 if clk4State != clk4LastState:
                     isRemoving = dt4State != clk4State
                     if isRemoving:
-                        blueRing.knobBack()
+   #                     blueRing.knobBack()
                         remove(blue, strip)
                     else:
-                        blueRing.knobForward()
+    #                    blueRing.knobForward()
                         add(blue, strip)
 
         #-----------MAGENTA----------------------------------------------------------------------------------------------
                 if clk5State != clk5LastState:
                     isRemoving = dt5State != clk5State
                     if isRemoving:
-                        magentaRing.knobBack()
+     #                   magentaRing.knobBack()
                         remove(magenta, strip)
                     else:
-                        magentaRing.knobForward()
+      #                  magentaRing.knobForward()
                         add(magenta, strip)
 
                 clk1LastState = clk1State
