@@ -25,7 +25,7 @@ class LEDColor:
         return self.name
 
     def isLit(self):
-        return self.row != 0 or self.col != 0
+        return self.row > 0 or self.col > 0
 
     def increment(self):
         if self.col < (colMax - 1):
@@ -33,7 +33,6 @@ class LEDColor:
         else:
             self.col = 0
             self.row += 1
-        print self.color, ": ", self.row, self.col
 
     def decrement(self):
         if self.col == 0 and self.row == 0:
@@ -45,7 +44,7 @@ class LEDColor:
             return True
 
         self.col -= 1
-        return self.col == 0 and self.row == 0
+        return self.col == 0 or self.row == 0
 
     def getPosition(self):
         return matrix[self.row][self.col]
@@ -58,7 +57,8 @@ magenta = LEDColor(Color(0,255,255), 'MAGENTA', 4)
 off = LEDColor(Color(0,0,0), 'OFF', -999999)
 
 def redrawColor(ledColor, removeEnd, strip):
-    # If removing a color remove a row, then remove the. excess row color at the end
+    print 'Redrawing ', ledColor
+    # If removing a color removes a row, then remove the excess row color at the end
     if removeEnd:
         rowToRemove = ledColor.row + calculateOffset(ledColor) + 1
         if rowToRemove < 20:
@@ -109,7 +109,6 @@ def calculateOffset(ledColor):
     return offset
 
 def drawColor(row, col, strip, ledColor, clear = True, wait_ms=50):
-    print 'Redrawing ', ledColor
     offset = calculateOffset(ledColor)
     strip.setPixelColor(matrix[row + offset][col], ledColor.color)
     if ledColor.col is 0 and clear:
@@ -153,9 +152,9 @@ def redrawColors(ledColor, removeEnd, strip):
 # Adds a color to the LED strip. Returns resulting data about this color as a dictionary
 #
 def add(ledColor, strip):
-    print "adding ", ledColor, " at ", matrix[ledColor.row][ledColor.col]
     if ledColor.row > rowMax - 1:
         return
+    # print "adding ", ledColor, " at ", matrix[ledColor.row][ledColor.col]
     drawColor(ledColor.row, ledColor.col, strip, ledColor)
     ledColor.increment()
     if (ledColor.col == 1):
@@ -166,15 +165,15 @@ def add(ledColor, strip):
 # Removes a color from the LED strip. Returns resulting data about this color as a dictionary
 #
 def remove(ledColor, strip):
-    print 'remove ', ledColor, ' at ', matrix[ledColor.row][ledColor.col]
     if not ledColor.isLit():
         return
+    # print 'remove ', ledColor, ' at ', matrix[ledColor.row][ledColor.col]
     removedRow = ledColor.decrement()
 
     offset = calculateOffset(ledColor)
     strip.setPixelColor(matrix[ledColor.row + offset][ledColor.col], off.color)
 
     if removedRow:
-        print ledColor, ' row removed, redrawing...'
+        # print ledColor, ' row removed, redrawing...'
         redrawColors(ledColor, True, strip)
     strip.show()
