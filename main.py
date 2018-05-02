@@ -90,7 +90,13 @@ def createMessage(color, isRemoving):
     else:
         color.requestedPosition += 1
     # print 'Requesting ', color, ' at position: ', color.requestedPosition
-    return "{'id': " + str(color.id) + ", 'n': '" + str(color.requestedPosition * messagesPerLed) + "'}"
+    return json.dumps({
+        "id": color.id,
+        "n": color.requestedPosition * messagesPerLed,
+        "ts": time.time(),
+    })
+
+    #return "{'id': " + str(color.id) + ", 'n': '" + str(color.requestedPosition * messagesPerLed) + "'}"
 
 def isOutOfBounds(color, isRemoving):
     return (isRemoving and color.requestedPosition <= 0) or (not isRemoving and color.requestedPosition >= 127)

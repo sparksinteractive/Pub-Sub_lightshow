@@ -60,8 +60,10 @@ off = LEDColor(Color(0,0,0), 'OFF', -999999)
 def redrawColor(ledColor, removeEnd, strip):
     # If removing a color remove a row, then remove the. excess row color at the end
     if removeEnd:
-        for col in range(0, colMax):
-            strip.setPixelColor(matrix[ledColor.row + calculateOffset(ledColor) + 1][col], off.color)
+        rowToRemove = ledColor.row + calculateOffset(ledColor) + 1
+        if rowToRemove < 20:
+            for col in range(0, colMax):
+                strip.setPixelColor(matrix[ledColor.row + calculateOffset(ledColor) + 1][col], off.color)
 
     # Light up all full rows of color
     for row in range(0, ledColor.row):
@@ -73,8 +75,11 @@ def redrawColor(ledColor, removeEnd, strip):
         drawColor(ledColor.row, col, strip, ledColor, False)
 
     # Turn off the rest of lights in last row
+    lastRow = ledColor.row + calculateOffset(ledColor)
+    if lastRow >= 20:
+        return
     for col in range(ledColor.col, colMax):
-        strip.setPixelColor(matrix[ledColor.row + calculateOffset(ledColor)][col], off.color)
+        strip.setPixelColor(matrix[lastRow][col], off.color)
 
 def calculateOffset(ledColor):
     if ledColor == yellow:
