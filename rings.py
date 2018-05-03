@@ -14,7 +14,7 @@ MAGENTA_COLOR = Color(0,255,255)
 RING            = 13
 RING_CHANNEL    = 1
 RING_COUNT      = 48
-KNOB_INCREMENTS = 5
+KNOB_INCREMENTS = 6
 
 # ZIGZAG     = 19
 ZIGZAG_MAX = 24
@@ -25,9 +25,20 @@ ring = Adafruit_NeoPixel(RING_COUNT, RING, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED
 def ringWipe(ringColor, isOn, wait_ms=50):
     # print 'Ring: ', isOn, ' for ', ringColor.name, 'at ', ringColor.pos
     colorToUse = ringColor.color if isOn else Color(0, 0, 0)
-    ring.setPixelColor(ringColor.pos, colorToUse)
-    if ringColor.pos == 0:
-        zigzagWipe(ringColor.zigzag, isOn)
+    pos = (ringColor.knob / 6) - 1 + ringColor.startPos
+
+    if isOn:
+        start = ringColor.startPos
+        end = pos
+    else:
+        start = pos
+        end = ringColor.startPos + 24
+
+    for i in range(start, end):
+        ring.setPixelColor(pos, colorToUse)
+    # Not yet showing zigzags
+    # if pos == 0:
+    #     zigzagWipe(ringColor.zigzag, isOn)
 
 def zigzagWipe(zigzag, isOn, wait_ms=50):
     # print 'Zigzag: ', isOn , ' for ', zigzag.name, 'at ', zigzag.pos
@@ -49,7 +60,7 @@ class Zigzag:
         self.on = isOn
         zigzagWipe(self, self.on)
 
-yellowZigzag = Zigzag(YELLOW_COLOR, "YELLOW", 24)
+yellowZigzag = Zigzag(YELLOW_COLOR, "YELLOW", 120)
 redZigzag = Zigzag(RED_COLOR, "RED", 144)
 greenZigzag = Zigzag(GREEN_COLOR, "GREEN", 168)
 blueZigzag = Zigzag(BLUE_COLOR, "BLUE", 192)
@@ -59,7 +70,7 @@ class Ring:
     def __init__(self, color, name, startPos, zigzag):
         self.color = color
         self.name = name
-        self.pos = 0 + startPos
+        self.startPos = startPos
         self.knob = 0
         self.zigzag = zigzag
 
@@ -67,26 +78,23 @@ class Ring:
         return self.name
 
     def knobForward(self):
-        if self.knob >= 128 or self.pos >= 24:
+        if self.knob >= 144:
             return
-        # print 'Moving forward ', self.name, ' with pos ', self.pos, ' and knob ', self.knob
+        # print 'Moving forward ', self.name, ' with knob ', self.knob
         self.knob += 1
         if self.knob % KNOB_INCREMENTS == 0:
-            print 'Ring light ON with pos: ', self.pos, ', knob: ', self.knob
+            print 'Ring light ON with knob: ', self.knob
             ringWipe(self, True)
-            self.pos += 1
             ring.show()
 
     def knobBack(self):
-        if self.knob <= 0 or self.pos < 0:
+        if self.knob <= 0:
             return
-        # print 'Moving back ', self.name, ' with pos ', self.pos, ' and knob ', self.knob
+        # print 'Moving back ', self.name, ' with knob ', self.knob
         self.knob -= 1
         if self.knob % KNOB_INCREMENTS == 0:
-            print 'Ring light OFF with pos: ', self.pos, ', knob: ', self.knob
+            print 'Ring light OFF with knob: ', self.knob
             ringWipe(self, False)
-            if self.pos > 0:
-                self.pos -= 1
             ring.show()
 
 

@@ -111,7 +111,7 @@ def isOutOfBounds(color, isRemoving):
     return (isRemoving and color.requestedPosition <= 0) or (not isRemoving and color.requestedPosition >= 127)
 
 if __name__ == '__main__':
-    deviceClient = DeviceClient(onHandleMessage)
+    # deviceClient = DeviceClient(onHandleMessage)
 
     # Process arguments
     parser = argparse.ArgumentParser()
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Intialize the library (must be called once before other functions).
-    deviceClient.begin()
+    # deviceClient.begin()
     strip.begin()
     ring.begin()
     print ('Press Ctrl-C to quit.')
@@ -140,7 +140,6 @@ if __name__ == '__main__':
 
 #-----------YELLOW-----------------------------------------------------------------------------------------------
             if clk1State != clk1LastState:
-                print 'clk1State: ', clk1State, ', clk1LastState: ', clk1LastState, ', dt1State: ', dt1State
                 isRemoving = dt1State != clk1State
                 if isRemoving:
                     print 'BACK'
@@ -148,10 +147,10 @@ if __name__ == '__main__':
                 else:
                     print 'FORWARD'
                     yellowRing.knobForward()
-                if not isOutOfBounds(yellow, isRemoving):
-                    message = createMessage(yellow, isRemoving)
-                    print 'Sending message: ', message
-                    deviceClient.publish(message)
+                # if not isOutOfBounds(yellow, isRemoving):
+                #     message = createMessage(yellow, isRemoving)
+                #     print 'Sending message: ', message
+                #     deviceClient.publish(message)
 
 #-----------RED--------------------------------------------------------------------------------------------------
             if clk2State != clk2LastState:
@@ -160,10 +159,10 @@ if __name__ == '__main__':
                     redRing.knobBack()
                 else:
                     redRing.knobForward()
-                if not isOutOfBounds(red, isRemoving):
-                    message = createMessage(red, isRemoving)
-                    print 'Sending message: ', message
-                    deviceClient.publish(message)
+                # if not isOutOfBounds(red, isRemoving):
+                #     message = createMessage(red, isRemoving)
+                #     print 'Sending message: ', message
+                #     deviceClient.publish(message)
 
 #-----------GREEN------------------------------------------------------------------------------------------------
             if clk3State != clk3LastState:
@@ -172,10 +171,10 @@ if __name__ == '__main__':
                     greenRing.knobBack()
                 else:
                     greenRing.knobForward()
-                if not isOutOfBounds(green, isRemoving):
-                    message = createMessage(green, isRemoving)
-                    print 'Sending message: ', message
-                    deviceClient.publish(message)
+                # if not isOutOfBounds(green, isRemoving):
+                #     message = createMessage(green, isRemoving)
+                #     print 'Sending message: ', message
+                #     deviceClient.publish(message)
 
 #-----------BLUE-------------------------------------------------------------------------------------------------
             if clk4State != clk4LastState:
@@ -184,10 +183,10 @@ if __name__ == '__main__':
                     blueRing.knobBack()
                 else:
                     blueRing.knobForward()
-                if not isOutOfBounds(blue, isRemoving):
-                    message = createMessage(blue, isRemoving)
-                    print 'Sending message: ', message
-                    deviceClient.publish(message)
+                # if not isOutOfBounds(blue, isRemoving):
+                #     message = createMessage(blue, isRemoving)
+                #     print 'Sending message: ', message
+                #     deviceClient.publish(message)
 
 #-----------MAGENTA----------------------------------------------------------------------------------------------
             if clk5State != clk5LastState:
@@ -196,10 +195,10 @@ if __name__ == '__main__':
                     magentaRing.knobBack()
                 else:
                     magentaRing.knobForward()
-                if not isOutOfBounds(magenta, isRemoving):
-                    message = createMessage(magenta, isRemoving)
-                    print 'Sending message: ', message
-                    deviceClient.publish(message)
+                # if not isOutOfBounds(magenta, isRemoving):
+                #     message = createMessage(magenta, isRemoving)
+                #     print 'Sending message: ', message
+                #     deviceClient.publish(message)
 
             clk1LastState = clk1State
             clk2LastState = clk2State
