@@ -59,13 +59,22 @@ clk4LastState = GPIO.input(clk4)
 clk5LastState = GPIO.input(clk5)
 
 messagesPerLed = 1562
+lastMessageHandled = time.time()
 
 # Create NeoPixel object with appropriate configuration.
 strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
 
 def onHandleMessage(data):
     """Handles messages received from IoT Core about metrics"""
-    print 'Received data: ', data
+    global lastMessageHandled
+    now = time.time()
+    if now - lastMessageHandled < 1:
+        # Wait 1 second before handling messages
+        print 'Ignoring message received before 1 second has elapsed'
+        return
+
+    lastMessageHandled = now
+    print 'Handling data: ', data
     mps = data['mps']
     total = data['total']
     displayColor(yellow, int(mps[0]))
@@ -89,11 +98,11 @@ def createMessage(color, isRemoving):
         color.requestedPosition -= 1
     else:
         color.requestedPosition += 1
-    # print 'Requesting ', color, ' at position: ', color.requestedPosition
+    print 'Requesting ', color, ' at position: ', color.requestedPosition
     return json.dumps({
         "id": color.id,
         "n": color.requestedPosition * messagesPerLed,
-        "ts": time.time(),
+        "ts": time.time()
     })
 
     #return "{'id': " + str(color.id) + ", 'n': '" + str(color.requestedPosition * messagesPerLed) + "'}"
@@ -114,95 +123,95 @@ if __name__ == '__main__':
     strip.begin()
     ring.begin()
     print ('Press Ctrl-C to quit.')
+    print('Use "-c" argument to clear LEDs on exit')
 
     try:
         while True:
-            if not args.clear:
-                print('Use "-c" argument to clear LEDs on exit')
-                try:
-                    while True:
-                        clk1State = GPIO.input(clk1)
-                        dt1State = GPIO.input(dt1)
-                        clk2State = GPIO.input(clk2)
-                        dt2State = GPIO.input(dt2)
-                        clk3State = GPIO.input(clk3)
-                        dt3State = GPIO.input(dt3)
-                        clk4State = GPIO.input(clk4)
-                        dt4State = GPIO.input(dt4)
-                        clk5State = GPIO.input(clk5)
-                        dt5State = GPIO.input(dt5)
+            clk1State = GPIO.input(clk1)
+            dt1State = GPIO.input(dt1)
+            clk2State = GPIO.input(clk2)
+            dt2State = GPIO.input(dt2)
+            clk3State = GPIO.input(clk3)
+            dt3State = GPIO.input(dt3)
+            clk4State = GPIO.input(clk4)
+            dt4State = GPIO.input(dt4)
+            clk5State = GPIO.input(clk5)
+            dt5State = GPIO.input(dt5)
 
-        #-----------YELLOW-----------------------------------------------------------------------------------------------
-                        if clk1State != clk1LastState:
-                            isRemoving = dt1State != clk1State
-                            if isRemoving:
-                                yellowRing.knobBack()
-                            else:
-                                yellowRing.knobForward()
-                            if not isOutOfBounds(yellow, isRemoving):
-                                message = createMessage(yellow, isRemoving)
-                                # print 'Sending message: ', message
-                                deviceClient.publish(message)
+#-----------YELLOW-----------------------------------------------------------------------------------------------
+            if clk1State != clk1LastState:
+                print 'clk1State: ', clk1State, ', clk1LastState: ', clk1LastState, ', dt1State: ', dt1State
+                isRemoving = dt1State != clk1State
+                if isRemoving:
+                    print 'BACK'
+                    yellowRing.knobBack()
+                else:
+                    print 'FORWARD'
+                    yellowRing.knobForward()
+                if not isOutOfBounds(yellow, isRemoving):
+                    message = createMessage(yellow, isRemoving)
+                    print 'Sending message: ', message
+                    deviceClient.publish(message)
 
-        #-----------RED--------------------------------------------------------------------------------------------------
-                        if clk2State != clk2LastState:
-                            isRemoving = dt2State != clk2State
-                            if isRemoving:
-                                redRing.knobBack()
-                            else:
-                                redRing.knobForward()
-                            if not isOutOfBounds(red, isRemoving):
-                                message = createMessage(red, isRemoving)
-                                # print 'Sending message: ', message
-                                deviceClient.publish(message)
+#-----------RED--------------------------------------------------------------------------------------------------
+            if clk2State != clk2LastState:
+                isRemoving = dt2State != clk2State
+                if isRemoving:
+                    redRing.knobBack()
+                else:
+                    redRing.knobForward()
+                if not isOutOfBounds(red, isRemoving):
+                    message = createMessage(red, isRemoving)
+                    print 'Sending message: ', message
+                    deviceClient.publish(message)
 
-        #-----------GREEN------------------------------------------------------------------------------------------------
-                        if clk3State != clk3LastState:
-                            isRemoving = dt3State != clk3State
-                            if isRemoving:
-                                greenRing.knobBack()
-                            else:
-                                greenRing.knobForward()
-                            if not isOutOfBounds(green, isRemoving):
-                                message = createMessage(green, isRemoving)
-                                # print 'Sending message: ', message
-                                deviceClient.publish(message)
+#-----------GREEN------------------------------------------------------------------------------------------------
+            if clk3State != clk3LastState:
+                isRemoving = dt3State != clk3State
+                if isRemoving:
+                    greenRing.knobBack()
+                else:
+                    greenRing.knobForward()
+                if not isOutOfBounds(green, isRemoving):
+                    message = createMessage(green, isRemoving)
+                    print 'Sending message: ', message
+                    deviceClient.publish(message)
 
-        #-----------BLUE-------------------------------------------------------------------------------------------------
-                        if clk4State != clk4LastState:
-                            isRemoving = dt4State != clk4State
-                            if isRemoving:
-                                blueRing.knobBack()
-                            else:
-                                blueRing.knobForward()
-                            if not isOutOfBounds(blue, isRemoving):
-                                message = createMessage(blue, isRemoving)
-                                # print 'Sending message: ', message
-                                deviceClient.publish(message)
+#-----------BLUE-------------------------------------------------------------------------------------------------
+            if clk4State != clk4LastState:
+                isRemoving = dt4State != clk4State
+                if isRemoving:
+                    blueRing.knobBack()
+                else:
+                    blueRing.knobForward()
+                if not isOutOfBounds(blue, isRemoving):
+                    message = createMessage(blue, isRemoving)
+                    print 'Sending message: ', message
+                    deviceClient.publish(message)
 
-        #-----------MAGENTA----------------------------------------------------------------------------------------------
-                        if clk5State != clk5LastState:
-                            isRemoving = dt5State != clk5State
-                            if isRemoving:
-                                magentaRing.knobBack()
-                            else:
-                                magentaRing.knobForward()
-                            if not isOutOfBounds(magenta, isRemoving):
-                                message = createMessage(magenta, isRemoving)
-                                # print 'Sending message: ', message
-                                deviceClient.publish(message)
+#-----------MAGENTA----------------------------------------------------------------------------------------------
+            if clk5State != clk5LastState:
+                isRemoving = dt5State != clk5State
+                if isRemoving:
+                    magentaRing.knobBack()
+                else:
+                    magentaRing.knobForward()
+                if not isOutOfBounds(magenta, isRemoving):
+                    message = createMessage(magenta, isRemoving)
+                    print 'Sending message: ', message
+                    deviceClient.publish(message)
 
-                        clk1LastState = clk1State
-                        clk2LastState = clk2State
-                        clk3LastState = clk3State
-                        clk4LastState = clk4State
-                        clk5LastState = clk5State
-                except KeyboardInterrupt:
-                    if args.clear:
-                        colorWipe(strip, Color(0,0,0), 10)
+            clk1LastState = clk1State
+            clk2LastState = clk2State
+            clk3LastState = clk3State
+            clk4LastState = clk4State
+            clk5LastState = clk5State
 
-                finally:
-                    GPIO.cleanup()
+    except KeyboardInterrupt:
+        if args.clear:
+            colorWipe(strip, Color(0,0,0), 10)
+
     finally:
+        GPIO.cleanup()
         deviceClient.stop()
 

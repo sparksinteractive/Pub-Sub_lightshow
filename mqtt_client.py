@@ -63,7 +63,8 @@ class ClientCallback(object):
         self.connected = False
 
     def on_publish(self, unused_client, unused_userdata, unused_mid):
-        print('Published message acked.')
+        # print('Published message acked.')
+        return
 
     def on_subscribe(self, unused_client, unused_userdata, unused_mid,
                      granted_qos):
@@ -73,8 +74,8 @@ class ClientCallback(object):
 
     def on_message(self, unused_client, unused_userdata, message):
         payload = message.payload
-        print('Received message \'{}\' on topic \'{}\' with Qos {}'.format(
-            payload, message.topic, str(message.qos)))
+        # print('Received message \'{}\' on topic \'{}\' with Qos {}'.format(
+            # payload, message.topic, str(message.qos)))
         if not payload:
             return
         data = json.loads(payload)
