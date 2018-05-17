@@ -7,13 +7,13 @@ import json
 import paho.mqtt.client as mqtt
 
 
-ssl_private_key_filepath = '/home/pi/.ssh/demo_private.pem'
+ssl_private_key_filepath = '<path to private key>'
 ssl_algorithm = 'RS256'
-root_cert_filepath = '/home/pi/.ssh/roots.pem'
-project_id = 'pubsub18'
-gcp_location = 'us-central1'
-registry_id = 'masterpi'
-device_id = 'pi01'
+root_cert_filepath = '<path to roots certificate>'
+project_id = '<PROJECT_ID>'
+gcp_location = '<LOCATION>'
+registry_id = '<REGISTRY_ID>'
+device_id = '<DEVICE_ID>'
 
 _CLIENT_ID = 'projects/{}/locations/{}/registries/{}/devices/{}'.format(project_id, gcp_location, registry_id, device_id)
 _MQTT_TOPIC = '/devices/{}/events'.format(device_id)
